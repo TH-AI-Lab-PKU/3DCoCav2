@@ -164,7 +164,7 @@ def do_train(
     loss_avg = SmoothedValue(window_size=10)
     device = next(model.parameters()).device
     for batch_data_label in dataloaders['train']:
-        # 确保所有输入数据转移到模型所在设备
+        # Ensure inputs are moved to the model device
         batch_data_label = {k: (v.to(device) if isinstance(v, torch.Tensor) else v) for k, v in batch_data_label.items()}
 
     model.train()
@@ -192,15 +192,15 @@ def do_train(
                 logout("Loss in not finite. Training will be stopped.")
                 sys.exit(1)
             
-            # 在 loss.backward() 前添加设备检查
+            # Add device checks before loss.backward()
             def check_tensor_device(tensor, name):
                 if not tensor.is_cuda:
                     raise RuntimeError(f"{name} 在CPU上，应在GPU上")
 
-            # 检查损失张量
+            # Check loss tensor
             check_tensor_device(loss, "损失张量")
     
-            # 检查模型参数设备
+            # Check model parameter devices
             for name, param in model.named_parameters():
                 if not param.is_cuda:
                     raise RuntimeError(f"模型参数 {name} 在CPU上")
